@@ -89,7 +89,7 @@ GetOptions ( 'help' => \$help,                # print help message
 # Print usage if there is no option or if the option is help
 pod2usage(1) if $help;
 print "$0 version: $VERSION\n" if $version;
-pod2usage(1) unless $version || $help;
+# pod2usage(1) unless $version || $help;
 
 =head1 FUNCTIONS
 
