@@ -1,1 +1,0 @@
-/home/jeremiah/code/perl/pkg-perl/scripts/qa/packagecheck.pl

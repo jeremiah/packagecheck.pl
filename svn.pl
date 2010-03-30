@@ -38,7 +38,7 @@ But you are welcome to use whatever code you find useful here.
 
      Run this script in a subversion repo above trunk/
 
-     packagecheck.pl [options]
+     packagecheck.pl [-c module] [-h] [-v]
 
      # check a package in the current directory
      packagecheck.pl --current libfoo-bar-perl
@@ -77,13 +77,16 @@ my %config;        # hash holding configuration options
 my ($automatic,    # flag for when this script gets called by other scripts
     $vcs,          #
     $version,      # Version of this file
+    $current,      # Check for a svn controlled module in the current dir
+    $all,          # All checks
     $homepage, $maintainer, $depends, $watch,
-    $create, $rules, $quilt, $all, $package, $help, $current );
+    $create, $rules, $quilt, $package, $help,  );
 
 GetOptions ( 'help' => \$help,                # print help message
 	     'current|c=s' => \$current,      # look for debian package in current dir
 	     'version' => \$version,          # the version of this script
 	     'auto' => \$automatic,           # make assumptions about our environment
+	     'all|A' => \$all,                # run all checks
 	   );
 
 # Print usage if there is no option or if the option is help
@@ -192,46 +195,8 @@ sub testvcs {
 }
 
 # Process options
-if ($current) {  # look for checked-out packages in the current dir
-  sanity_check("$current");
-  $fullpath = build_path($current);
-  if (!$automatic) {
-    # test which VCS we're using, git or svn. Maybe should be factored out to a sub?
-    if (capture([0..128], "ls $fullpath.svn")) {
-      $config{'vcs'} = "svn";                        # svn is our VCS
-      print "Running svn up in $fullpath . . .\n";   # we use svn if we find it
-      my @svnrev = capture("svn up $fullpath");
-      print "SVN: $svnrev[-1]";
-      print "Checking for uncommitted modifications to directory . . .\n";
-      my @svnmods = capture("svn st $fullpath");
-      if ($svnmods[-1]) {
-	print map { $_ } @svnmods;
-	die "Exiting. $fullpath appears to have uncommitted modifications.\n";
-      }
-      else {
-	print "It appears directory is clean.\n";
-      }
-    }
-    else { # No subversion, let's try git
-      print "Checking for git repository.\n";
-      my $gitrepo;
-      $gitrepo = Git->repository (Directory => "$fullpath"); 
-      my $lastrev = $gitrepo->command_oneline( [ 'rev-list', '--all' ],
-					     STDERR => 0 );
-      print "Lat revision: $lastrev\n";              # for debugging
-      $config{'vcs'} = "git";                        # git is our VCS
-      chdir($fullpath);
-      my $git_status = $gitrepo->command_oneline('status');
-      print "Checking for uncommitted modifications to directory . . .\n";
-      print "$git_status\n"; # <-- This doesn't seem to be working.
-      die "die for now.";
-    }
-  }
-  my @contents = slurp "$fullpath/debian/control";
-  my $ctrl_ref = \@contents;
-  remove_old_urls($ctrl_ref);                        # remove links to old resources
-  testvcs("$fullpath/debian/control");               # add any missing URLs
-}
+if ($all)
+
 
 =back
 
