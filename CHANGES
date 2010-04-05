@@ -1,0 +1,2 @@
+* Started to copy functionality from the shell script: packagecheck.
+* Currently the perl version partially implements the -c flag.
