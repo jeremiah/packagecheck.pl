@@ -202,15 +202,14 @@ if ($all) {
 }
 # --current
 if ($current) {
-  my $here = getcwd;
-  $fullpath = $here . "/";
-  sanity_check($fullpath);
+  $fullpath = getcwd;
+  sanity_check("$fullpath/.svn");
 
   unless ($automatic) {
     print "Running svn up on $fullpath . . .\n";
-    print map { $_ } capturex( EXIT_ANY, "svn","up","$fullpath/");
+    print map { $_ } capturex(EXIT_ANY, "svn","up","$fullpath/");
     print "Checking if $fullpath is clean . . .\n";
-    my @changed_lines = capturex( EXIT_ANY, "svn","st","$fullpath/" );
+    my @changed_lines = capturex(EXIT_ANY, "svn","st","$fullpath/");
     if ($#changed_lines > 0) {
       print map { $_ } @changed_lines;
     }
