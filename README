@@ -1,4 +1,11 @@
 README for packagecheck.pl
 ---
 
+packagecheck.pl is a perl script used inside the debian-perl group for checking packages
+maintained by that group. As a consequence, it is very debian-perl centric,
+and certain assumptions are made, like that you have the debian-perl svn repository
+checked out.
+
+Caveat Emptor: The script might not be of much use outside the debian-perl group.
+But you are welcome to use whatever code you find useful here.
 

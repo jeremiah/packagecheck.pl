@@ -67,6 +67,7 @@ use Cwd;
 use Carp qw(croak);
 use IPC::System::Simple qw(system capturex EXIT_ANY);
 use Perl6::Slurp;
+use Debian::Control;
 
 my $fullpath;      # variable to hold path information
 my $control_file;  # The control file of our package
@@ -187,8 +188,12 @@ if not present append correct URI to debian/control file.
 
 =cut
 
-sub testhomepage {
-  print "testing\n";
+sub testhomepage {  # Parse debian/control file.
+  my $path = shift;
+  $path .= "/debian/control";
+  my $ctrl = Debian::Control->new();
+  $ctrl->read($path);
+  print "$ctrl->source->Homepage\n";
 }
 
 
@@ -196,10 +201,10 @@ sub testhomepage {
 # Process options
 # --all
 if ($all) {
-  my $here = getcwd;
-  $fullpath = $here."/".$current;
-  sanity_check($fullpath);
+  $fullpath = getcwd;
+  sanity_check("$fullpath/.svn");
 }
+
 # --current
 if ($current) {
   $fullpath = getcwd;
@@ -220,6 +225,9 @@ if ($current) {
   else {  # we're being called by another script
     print "Automated.\n";
   }
+  # Do the various package tests
+  # testvcs($fullpath);
+  testhomepage($fullpath);
 }
 
 
