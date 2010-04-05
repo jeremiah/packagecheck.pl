@@ -152,7 +152,7 @@ sub remove_old_urls {
 
 =item testvcs
 
-Test for presence of Version Control System fields in control file, if not present
+Test for presence of Version Control fields in control file, if not present
 append correct field name and URLs to debian/control file.
 
 =cut
@@ -178,6 +178,20 @@ sub testvcs {
     undef $ctrl_ref;
   } 0..(@$replacements - 1);
 }
+
+
+=item testhomepage
+
+Test for presence of a 'homepage' or URI in control file,
+if not present append correct URI to debian/control file.
+
+=cut
+
+sub testhomepage {
+  print "testing\n";
+}
+
+
 
 # Process options
 # --all
