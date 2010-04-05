@@ -65,11 +65,10 @@ use Getopt::Long;
 use Pod::Usage;
 use Cwd;
 use Carp qw(croak);
-use IPC::System::Simple qw(system capture runx);
+use IPC::System::Simple qw(system capturex EXIT_ANY);
 use Perl6::Slurp;
-use Git;
 
-my $fullpath;      # a variable use to hold path information
+my $fullpath;      # variable to hold path information
 my $control_file;  # The control file of our package
 my %config;        # hash holding configuration options
 
@@ -83,7 +82,7 @@ my ($automatic,    # flag for when this script gets called by other scripts
     $create, $rules, $quilt, $package, $help,  );
 
 GetOptions ( 'help' => \$help,                # print help message
-	     'current|c=s' => \$current,      # look for debian package in current dir
+	     'current|c' => \$current,        # look for debian package in current dir
 	     'version' => \$version,          # the version of this script
 	     'auto' => \$automatic,           # make assumptions about our environment
 	     'all|A' => \$all,                # run all checks
@@ -98,19 +97,6 @@ print "$0 version: $VERSION\n" if $version;
 
 =over 8
 
-=item build_path
-
-Build the path to the dir we are checking. Pass a package name as an arg.
-
-=cut
-
-sub build_path {
-  my $cwd = &cwd;
-  my $package = shift;
-  my $dir = "$cwd/$package";
-  return $dir;
-}
-
 =item sanity_check
 
 Checks to see if we are in a directory. (Takes a directory as an arg.)
@@ -119,7 +105,6 @@ Checks to see if we are in a directory. (Takes a directory as an arg.)
 
 sub sanity_check {
   my $sane = shift;
-  build_path($sane);
   if (not -d $sane) { # we're not sane, so die
     die "Cannot find working directory $sane: $!";
   }
@@ -162,7 +147,7 @@ Remove any reference to no longer used resources, like WebSVN or any old XS-Vcs-
 
 sub remove_old_urls {
   my $control_ref = shift;
-#  print map { "->" . $_ . "\n" } @$control_ref;
+  #  print map { "->" . $_ . "\n" } @$control_ref;
 }
 
 =item testvcs
@@ -195,7 +180,34 @@ sub testvcs {
 }
 
 # Process options
-if ($all)
+# --all
+if ($all) {
+  my $here = getcwd;
+  $fullpath = $here."/".$current;
+  sanity_check($fullpath);
+}
+# --current
+if ($current) {
+  my $here = getcwd;
+  $fullpath = $here . "/";
+  sanity_check($fullpath);
+
+  if (! $automatic) {
+    print "Running svn up on $fullpath . . .\n";
+    print map { $_ } capturex( EXIT_ANY, "svn","up","$fullpath/");
+    print "Checking if $fullpath is clean . . .\n";
+    my @changed_lines = capturex( EXIT_ANY, "svn","st","$fullpath/");
+    if ($#changed_lines > 0) {
+      print map { $_ } @changed_lines;
+    }
+    else {
+      print "Target directory apparently unchanged.\n";
+    }
+  }
+  else {  # we're being called by another script
+    print "Automated.\n";
+  }
+}
 
 
 =back
