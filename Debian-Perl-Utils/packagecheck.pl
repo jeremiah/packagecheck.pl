@@ -6,9 +6,6 @@
 # Copyright 2007 David Paleino <d.paleino@gmail.com>
 # Released under the terms of the GNU GPL version 2
 #
-# To be run one directory above trunk/
-# (package name can be specified as the first argument in a
-# different directory with --current)
 
 ##  TODO: Make this script work in a git repository as well as svn
 
@@ -79,7 +76,8 @@ my ($automatic,    # flag for when this script gets called by other scripts
     $version,      # Version of this file
     $current,      # Check for a svn controlled module in the current dir
     $all,          # All checks
-    $homepage, $maintainer, $depends, $watch,
+    $homepage,     # Check for a URL in control file
+    $maintainer, $depends, $watch,
     $create, $rules, $quilt, $package, $help,  );
 
 GetOptions ( 'help' => \$help,                # print help message
@@ -196,6 +194,22 @@ sub testhomepage {  # Parse debian/control file.
   print "$ctrl->source->Homepage\n";
 }
 
+=item always_done
+
+A small set of checks that are always done, regardless of what
+arguments are passed to the script.
+
+=cut
+
+sub testhomepage {  # Parse debian/control file.
+  my $path = shift;
+  $path .= "/debian/control";
+  my $ctrl = Debian::Control->new();
+  $ctrl->read($path);
+  print "$ctrl->source->Homepage\n";
+}
+
+
 
 
 # Process options
@@ -228,6 +242,12 @@ if ($current) {
   # Do the various package tests
   # testvcs($fullpath);
   testhomepage($fullpath);
+}
+
+if ($homepage) {
+  $fullpath = getcwd;
+  sanity_check("$fullpath/.svn");
+  testhomepage($fullpath)
 }
 
 

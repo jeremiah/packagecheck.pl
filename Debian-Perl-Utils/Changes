@@ -1,0 +1,14 @@
+Revision history for Debian-Perl-Utils
+
+0.01    Sometime in 2009
+        First version, unreleased
+
+	* Started to copy functionality from the shell script: packagecheck.
+	* Currently the perl version partially implements the -c flag.
+
+0.03    Tue Apr 6 21:24:57 CEST 2010
+        Sort of unreleased, not yet used, but on Github and in the
+	debian-perl SVN repo
+
+	* More arguments now processed.
+	
