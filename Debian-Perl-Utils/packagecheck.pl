@@ -65,6 +65,7 @@ use Carp qw(croak);
 use IPC::System::Simple qw(system capturex EXIT_ANY);
 use Perl6::Slurp;
 use Debian::Control;
+use Debian::Perl::Utils;
 
 my $fullpath;      # variable to hold path information
 my $control_file;  # The control file of our package
@@ -95,19 +96,6 @@ print "$0 version: $VERSION\n" if $version;
 =head1 FUNCTIONS
 
 =over 8
-
-=item sanity_check
-
-Checks to see if we are in a directory. (Takes a directory as an arg.)
-
-=cut
-
-sub sanity_check {
-  my $sane = shift;
-  if (not -d $sane) { # we're not sane, so die
-    die "Cannot find working directory $sane: $!";
-  }
-}
 
 =item append_control
 
@@ -194,35 +182,19 @@ sub testhomepage {  # Parse debian/control file.
   print "$ctrl->source->Homepage\n";
 }
 
-=item always_done
-
-A small set of checks that are always done, regardless of what
-arguments are passed to the script.
-
-=cut
-
-sub testhomepage {  # Parse debian/control file.
-  my $path = shift;
-  $path .= "/debian/control";
-  my $ctrl = Debian::Control->new();
-  $ctrl->read($path);
-  print "$ctrl->source->Homepage\n";
-}
-
-
 
 
 # Process options
 # --all
 if ($all) {
   $fullpath = getcwd;
-  sanity_check("$fullpath/.svn");
+  svn_sanity_check("$fullpath/.svn");
 }
 
 # --current
 if ($current) {
   $fullpath = getcwd;
-  sanity_check("$fullpath/.svn");
+  svn_sanity_check("$fullpath/.svn");
 
   unless ($automatic) {
     print "Running svn up on $fullpath . . .\n";
@@ -246,7 +218,7 @@ if ($current) {
 
 if ($homepage) {
   $fullpath = getcwd;
-  sanity_check("$fullpath/.svn");
+  svn_sanity_check("$fullpath/.svn");
   testhomepage($fullpath)
 }
 

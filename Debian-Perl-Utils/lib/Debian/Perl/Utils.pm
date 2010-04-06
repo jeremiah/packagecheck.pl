@@ -1,11 +1,8 @@
 package Debian::Perl::Utils;
 
-use warnings;
-use strict;
-
 =head1 NAME
 
-Debian::Perl::Utils - The great new Debian::Perl::Utils!
+Debian::Perl::Utils - Utility functions used in the debian-perl group.
 
 =head1 VERSION
 
@@ -18,28 +15,47 @@ our $VERSION = '0.01';
 
 =head1 SYNOPSIS
 
-Quick summary of what the module does.
-
-Perhaps a little code snippet.
+Various useful functions for munging repository, deb, and module data.
+Probably not a very useful module outside of the debian-perl group.
 
     use Debian::Perl::Utils;
-
-    my $foo = Debian::Perl::Utils->new();
-    ...
-
-=head1 EXPORT
-
-A list of functions that can be exported.  You can delete this section
-if you don't export anything, such as for a purely object-oriented module.
+    my $module = Debian::Perl::Utils->new();
 
 =head1 SUBROUTINES/METHODS
 
-=head2 function1
+=over 4
+
+=item _svn_check
+
+Checks to see if we can find a .svn directory. Dies if we can't.
 
 =cut
 
-sub function1 {
+use Moose;
+
+
+has 'repo' =>
+  ( is => 'rw',
+    isa => 'Str',
+  );
+
+sub _svn_check {
+  my ($self, $dir) = @_;
+  $dir .= "/.svn";
+  if (not -d "$dir") {
+    die "Cannot find subversion directory $dir: $!";
+  }
+  else { 
+    $self->repo($dir); 
+  }
+  return $self->repo;
 }
+
+no Moose;
+__PACKAGE__->meta->make_immutable;
+
+
+=back
 
 =head2 function2
 
@@ -57,8 +73,6 @@ Jeremiah C. Foster, C<< <jeremiah at jeremiahfoster.com> >>
 Please report any bugs or feature requests to C<bug-debian-perl-utils at rt.cpan.org>, or through
 the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Debian-Perl-Utils>.  I will be notified, and then you'll
 automatically be notified of progress on your bug as I make changes.
-
-
 
 
 =head1 SUPPORT
@@ -98,8 +112,7 @@ L<http://search.cpan.org/dist/Debian-Perl-Utils/>
 
 Copyright 2010 Jeremiah C. Foster.
 
-This program is released under the following license: GPL
-
+This program is released under the following license: GPL v.2 or greater
 
 =cut
 
