@@ -70,6 +70,7 @@ use Debian::Perl::Utils;
 my $fullpath;      # variable to hold path information
 my $control_file;  # The control file of our package
 my %config;        # hash holding configuration options
+my $svn = Debian::Perl::Utils->new();   # SVN object
 
 # Options
 my ($automatic,    # flag for when this script gets called by other scripts
@@ -91,7 +92,6 @@ GetOptions ( 'help' => \$help,                # print help message
 # Print usage if there is no option or if the option is help
 pod2usage(1) if $help;
 print "$0 version: $VERSION\n" if $version;
-# pod2usage(1) unless $version || $help;
 
 =head1 FUNCTIONS
 
@@ -106,7 +106,7 @@ Append missing files to debian/control files in the correct locations
 sub append_control {
   my ($orig, $replacement, $ctrl_ref) = @_;
   open my $fh, '>', $orig or croak "Cannot open $control_file: $!\n";
-  # Should I write to a temporary file, instead of re-writing the control file?
+  # TODO: Should I write to a temporary file, instead of re-writing the control file?
 
   map {
     my $line_before = $_;
@@ -183,18 +183,17 @@ sub testhomepage {  # Parse debian/control file.
 }
 
 
-
 # Process options
 # --all
 if ($all) {
   $fullpath = getcwd;
-  svn_sanity_check("$fullpath/.svn");
+  $svn->_svn_check("$fullpath/.svn");
 }
 
 # --current
 if ($current) {
   $fullpath = getcwd;
-  svn_sanity_check("$fullpath/.svn");
+  $svn->_svn_check("$fullpath/.svn");
 
   unless ($automatic) {
     print "Running svn up on $fullpath . . .\n";
@@ -218,14 +217,12 @@ if ($current) {
 
 if ($homepage) {
   $fullpath = getcwd;
-  svn_sanity_check("$fullpath/.svn");
+  $svn->_svn_check("$fullpath/.svn");
   testhomepage($fullpath)
 }
-
 
 =back
 
 =cut
-
 
 1; # End of packagecheck.pl

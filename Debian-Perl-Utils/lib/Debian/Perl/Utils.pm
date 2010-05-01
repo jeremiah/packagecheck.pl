@@ -33,20 +33,16 @@ Checks to see if we can find a .svn directory. Dies if we can't.
 
 use Moose;
 
-
-has 'repo' =>
-  ( is => 'rw',
-    isa => 'Str',
-  );
+has 'repo' => ( is => 'rw', isa => 'Str',);
 
 sub _svn_check {
   my ($self, $dir) = @_;
   $dir .= "/.svn";
   if (not -d "$dir") {
-    die "Cannot find subversion directory $dir: $!";
+    die "Cannot find subversion directory.\n$!";
   }
-  else { 
-    $self->repo($dir); 
+  else {
+    $self->repo($dir);
   }
   return $self->repo;
 }
@@ -104,8 +100,8 @@ L<http://search.cpan.org/dist/Debian-Perl-Utils/>
 
 =back
 
-
 =head1 ACKNOWLEDGEMENTS
+
 
 
 =head1 LICENSE AND COPYRIGHT

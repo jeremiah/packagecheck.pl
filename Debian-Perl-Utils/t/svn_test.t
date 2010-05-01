@@ -15,8 +15,8 @@ my $svn = Debian::Perl::Utils->new($svn_ref);
 isa_ok($svn, "Debian::Perl::Utils");
 
 ##
-## This is hard coded! You'll want to put your own SVN dir here. 
+## This is hard coded! You'll want to put your own SVN dir here.
 ##
-$svn->_svn_check("/home/jeremiah/code/perl/pkg-perl/libnet-dhcp-perl");
-diag($svn->{'repo'});
+#$svn->_svn_check("/home/jeremiah/code/perl/pkg-perl/libnet-dhcp-perl");
+#diag($svn->{'repo'});
 

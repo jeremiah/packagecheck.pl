@@ -4,3 +4,4 @@ testing/
 trunk/
 Debian-Perl-Utils/pm_to_blib
 Debian-Perl-Utils/blib
+Debian-Perl-Utils/Makefile
