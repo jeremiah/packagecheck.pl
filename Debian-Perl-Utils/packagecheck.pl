@@ -50,7 +50,11 @@ Print a brief help message, then exit.
 
 =item B<--current> package
 
-Test a package that is in the current working directory.
+Runs all tests on a package that is passed as an argument to --current.
+
+=item B<--homepage> package
+
+Checks for a homepage in package that is passed as an argument to --homepage.
 
 =back
 
@@ -77,16 +81,15 @@ my ($automatic,    # flag for when this script gets called by other scripts
     $vcs,          #
     $version,      # Version of this file
     $current,      # Check for a svn controlled module in the current dir
-    $all,          # All checks
     $homepage,     # Check for a URL in control file
     $maintainer, $depends, $watch,
     $create, $rules, $quilt, $package, $help,  );
 
-GetOptions ( 'help' => \$help,                # print help message
-	     'current|c' => \$current,        # look for debian package in current dir
+GetOptions ( 'help|h' => \$help,              # print help message
+	     'current|c=s' => \$current,      # argument is package dir to check
 	     'version' => \$version,          # the version of this script
+	     'homepage|H=s' => \$homepage,      # check for homepage in control file
 	     'auto' => \$automatic,           # make assumptions about our environment
-	     'all|A' => \$all,                # run all checks
 	   );
 
 # Print usage if there is no option or if the option is help
@@ -179,21 +182,26 @@ sub testhomepage {  # Parse debian/control file.
   $path .= "/debian/control";
   my $ctrl = Debian::Control->new();
   $ctrl->read($path);
-  print "$ctrl->source->Homepage\n";
+  if ($ctrl->source->Homepage =~ /http:*/) {
+    print $ctrl->source->Homepage . "\n";
+  }
+  else {
+    # check CPAN for home page?
+    print "No home page found.\n";
+  }
 }
 
 
-# Process options
-# --all
-if ($all) {
-  $fullpath = getcwd;
-  $svn->_svn_check("$fullpath/.svn");
-}
+# --- Process remaining options
 
 # --current
 if ($current) {
+  # print "Checking $current\n";
   $fullpath = getcwd;
-  $svn->_svn_check("$fullpath/.svn");
+  if (-d $current) {
+    $fullpath .= "/" . $current;
+  }
+  $svn->_svn_check("$fullpath");
 
   unless ($automatic) {
     print "Running svn up on $fullpath . . .\n";
@@ -216,9 +224,8 @@ if ($current) {
 }
 
 if ($homepage) {
-  $fullpath = getcwd;
-  $svn->_svn_check("$fullpath/.svn");
-  testhomepage($fullpath)
+  $svn->_svn_check($homepage);
+  testhomepage($homepage)
 }
 
 =back

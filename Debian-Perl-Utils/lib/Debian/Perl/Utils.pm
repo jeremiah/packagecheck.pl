@@ -37,9 +37,9 @@ has 'repo' => ( is => 'rw', isa => 'Str',);
 
 sub _svn_check {
   my ($self, $dir) = @_;
-  $dir .= "/.svn";
+  # $dir .= "/.svn";
   if (not -d "$dir") {
-    die "Cannot find subversion directory.\n$!";
+    die "Cannot find subversion directory $dir\n";
   }
   else {
     $self->repo($dir);
@@ -51,14 +51,14 @@ no Moose;
 __PACKAGE__->meta->make_immutable;
 
 
+
 =back
 
-=head2 function2
+=head2 foo
+
 
 =cut
 
-sub function2 {
-}
 
 =head1 AUTHOR
 
